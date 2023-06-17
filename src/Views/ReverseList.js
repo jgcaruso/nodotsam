@@ -176,8 +176,11 @@ const ReverseList = () => {
 			- if that request fails, just do a search with default behaviour
 		*/
 		try {
-			let lastSeenId = localStorage['prev2LastSeenId'] ?? '110437232023975165'
-			loadToots( lastSeenId )
+			let lastSeenId = localStorage['prev2LastSeenId']
+
+			if ( lastSeenId ) {
+				loadToots( lastSeenId )
+			}
 		} catch (ex) {
 			console.log( 'could not retrieve last saved state (localStorage access failed). Checking markers.' )
 
