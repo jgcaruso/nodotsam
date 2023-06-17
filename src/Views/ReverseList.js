@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'preact/hooks';
 import { query } from '../mastodon-query';
 import AccountWithToots from './AccountWithToots';
 import Toot from './Toot'
+import About from './About'
 import { compareTootId, ready, getAppCreds, getAccessToken } from '../functions'
 
 const ReverseList = () => {
@@ -204,17 +205,7 @@ const ReverseList = () => {
 	}
 
 	if ( ! accessToken ) {
-		return (
-			<>
-				<h1>Welcome to Completionist.social</h1>
-				<p>
-					blah blah blah mastodon app to view your Home feed in top to bottom chronological order.
-				</p>
-				<p>
-					<a href='/login'>Login</a>
-				</p>
-			</>
-		)
+		return <About />
 	}
 
 	/*

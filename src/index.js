@@ -7,12 +7,14 @@ import Login from './Views/login'
 import { query, getOauthCreds } from './mastodon-query'
 import { getAppCreds, getAccessToken } from './functions'
 import OauthCallback from './Views/OauthCallback'
+import About from './Views/About'
 
 const Page = () => {
 	return (
 		<div className="page">
 			<Router>
 				<ReverseList path='/' />
+				<About path='/about' showHomeLink={ true } />
 				<OauthCallback path='/callback' />
 				<Login path='/login' />
 			</Router>
