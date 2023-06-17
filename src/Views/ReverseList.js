@@ -184,13 +184,13 @@ const ReverseList = () => {
 
 		if ( lastSeenId ) {
 			loadToots( lastSeenId )
+		} else {
+			query( appCreds.instance, accessToken, '/api/v1/markers?timeline[]=home' )
+				.then( r => {
+					loadToots( r.last_read_id )
+				} )
+				.catch( e => loadToots() )
 		}
-
-		query( appCreds.instance, accessToken, '/api/v1/markers?timeline[]=home' )
-			.then( r => {
-				loadToots( r.last_read_id )
-			} )
-			.catch( e => loadToots() )
 	}
 	, []);
 
