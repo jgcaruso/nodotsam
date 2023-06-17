@@ -7,19 +7,19 @@ module.exports = {
   entry: './src/index.js',
   devtool: 'inline-source-map',
   devServer: {
-    static: './dist',
+    static: './docs',
     port: 8081,
     historyApiFallback: true
   },
   plugins: [
     new HtmlWebpackPlugin({
-      title: 'Mastodon messages-like app',
+      title: 'nodotsam.party',
     }),
     new Dotenv(),
   ],
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'docs'),
     clean: true,
     publicPath: '/'
   },
