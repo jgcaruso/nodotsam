@@ -3,6 +3,7 @@ import { getServerName } from './functions'
 
 
 export const redirectUri = `${ getServerName() }/callback`
+export const appName = 'nodotsam.party'
 
 export function createApp( instance ) {
 	const promise = new Promise( ( resolve, reject ) => {
@@ -10,7 +11,7 @@ export function createApp( instance ) {
 			method: 'POST',
 			url: `https://${ instance }/api/v1/apps`,
 			data: {
-				client_name: 'Completionist',
+				client_name: appName,
 				redirect_uris: redirectUri,
 				scopes: 'read write push',
 				website: 'https://johncaruso.ca'
