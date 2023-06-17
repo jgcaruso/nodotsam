@@ -175,21 +175,22 @@ const ReverseList = () => {
 			- if not set, use mastodon marker
 			- if that request fails, just do a search with default behaviour
 		*/
+		let lastSeenId = null
 		try {
-			let lastSeenId = localStorage['prev2LastSeenId']
-
-			if ( lastSeenId ) {
-				loadToots( lastSeenId )
-			}
+			lastSeenId = localStorage['prev2LastSeenId']
 		} catch (ex) {
 			console.log( 'could not retrieve last saved state (localStorage access failed). Checking markers.' )
-
-			query( appCreds.instance, accessToken, '/api/v1/markers?timeline[]=home' )
-				.then( r => {
-					loadToots( r.last_read_id )
-				} )
-				.catch( e => loadToots() )
 		}
+
+		if ( lastSeenId ) {
+			loadToots( lastSeenId )
+		}
+
+		query( appCreds.instance, accessToken, '/api/v1/markers?timeline[]=home' )
+			.then( r => {
+				loadToots( r.last_read_id )
+			} )
+			.catch( e => loadToots() )
 	}
 	, []);
 
