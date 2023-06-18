@@ -6,7 +6,7 @@
 	--toot-link-color: #096582;
 }
 
-@media( xprefers-color-scheme: dark ) {
+@media( prefers-color-scheme: dark ) {
 	:root {
 		--background: rgb(69, 69, 69);
 		--text: #ffffff;
