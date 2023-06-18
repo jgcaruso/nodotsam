@@ -50,6 +50,13 @@ const ReverseList = () => {
 
 				if ( 0 === newToots.length ) {
 					document.getElementById( 'bottom-indicator' ).innerText = 'No more toots'
+
+					// check again in some number of seconds
+					setTimeout( () => {
+						document.getElementById( 'bottom-indicator' ).innerText = 'checking...'
+						loadToots( loadFromId, true )
+					}, 60000)
+
 					return;
 				}
 
