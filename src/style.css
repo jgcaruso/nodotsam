@@ -91,6 +91,29 @@ body {
 	width: 100%;
 }
 
+.toot .card {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+
+	border: 1px solid lightgrey;
+	padding: 10px;
+	border-radius: 10px;
+}
+
+.toot .card img {
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+.toot .card .link {
+	display: flex;
+	flex-direction: column;
+	text-decoration: none;
+	color: var(--text);
+}
+
 .toot .timestamp {
 	margin-top: 10px;
 }
