@@ -49,7 +49,7 @@ const ReverseList = () => {
 			.then ( newToots => {
 
 				if ( 0 === newToots.length ) {
-					document.getElementById( 'bottom-indicator' ).innerText = 'No more toots'
+					document.getElementById( 'bottom-indicator' ).innerText = append ? 'No more toots' : 'No unread toots'
 
 					// check again in some number of seconds
 					setTimeout( () => {
