@@ -37,7 +37,7 @@ const ReverseList = () => {
 			return;
 		}
 
-		let homeQuery = '/api/v1/timelines/home?limit=5';
+		let homeQuery = '/api/v1/timelines/home?limit=20';
 
 		if ( !! loadFromId ) {
 			homeQuery = homeQuery + `&min_id=${ loadFromId }`
