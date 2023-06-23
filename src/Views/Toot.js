@@ -1,7 +1,8 @@
 import moment from 'moment';
 import { Fragment } from 'preact'
-import { useEffect, useRef } from 'preact/hooks';
-import { noop } from '../functions'
+import { useEffect, useRef } from 'preact/hooks'
+import { noop, getAppCreds, getAccessToken } from '../functions'
+import { query } from '../mastodon-query'
 
 export default function Toot( { toot, showAuthor = false, booster = null, boosterId = null, observe = noop } ) {
 
@@ -50,6 +51,12 @@ export default function Toot( { toot, showAuthor = false, booster = null, booste
 		}
 	}
 
+	const handleRepliesClick = () => {
+		// query( getAppCreds().instance, getAccessToken(), `/api/v1/statuses/${ toot.id }/context` )
+			// .then( r => console.log( r ) )
+		window.open( toot.url )
+	}
+
 	return (
 		<div className="toot">
 			{
@@ -57,7 +64,7 @@ export default function Toot( { toot, showAuthor = false, booster = null, booste
 					<div className="header-bar booster">
 						<span>Boosted by</span>
 						<img className="avatar" src={booster.avatar} />
-						<div className="name">{ booster.acct }</div>
+						<div className="name" onClick={ () => window.open( booster.url ) }>{ booster.acct }</div>
 					</div>
 				)
 			}
@@ -65,11 +72,14 @@ export default function Toot( { toot, showAuthor = false, booster = null, booste
 				showAuthor && (
 					<div className="header-bar">
 						<img className="avatar" src={toot.account.avatar} />
-						<div className="name">{ toot.account.acct }</div>
+						<div className="name" onClick={ () => window.open( toot.account.url ) }>{ toot.account.acct }</div>
 					</div>
 				)
 			}
 			<div className="timestamp" title={toot.created_at}>{moment(toot.created_at).fromNow()}</div>
+			{ toot.replies_count > 0 && (
+				<button className="replies" onClick={ handleRepliesClick }>see replies ({ toot.replies_count })</button>
+			) }
 			<div className="content" dangerouslySetInnerHTML={{ __html: html }} />
 			{ toot.card && (
 				<div className="card">

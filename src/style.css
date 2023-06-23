@@ -59,6 +59,10 @@ body {
 	margin-right: 10px;
 }
 
+.header-bar .name {
+	cursor: pointer;
+}
+
 .account .name {
 	font-weight: 600;
 	font-size: 18px;
@@ -116,6 +120,11 @@ body {
 
 .toot .timestamp {
 	margin-top: 10px;
+}
+
+.toot button.replies {
+	margin: 10px 0;
+	cursor: pointer;
 }
 
 .page .error {
