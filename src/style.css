@@ -118,6 +118,15 @@ body {
 	color: var(--text);
 }
 
+.toot .card .video {
+	margin-bottom: 10px;
+}
+
+.toot .card .video iframe {
+	width: 100%;
+	height: 100%;
+}
+
 .toot .timestamp {
 	margin-top: 10px;
 }

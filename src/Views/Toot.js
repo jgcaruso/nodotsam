@@ -44,7 +44,7 @@ export default function Toot( { toot, showAuthor = false, booster = null, booste
 		if ( 'video' === card.type ) {
 			return (
 				<>
-					<div dangerouslySetInnerHTML={{ __html: card.html }} />
+					<div className="video" dangerouslySetInnerHTML={{ __html: card.html }} />
 					<a className="link" href={ card.url }>{ card.title }</a>
 				</>
 			)
