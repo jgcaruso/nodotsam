@@ -97,13 +97,14 @@ const ReverseList = ( { feed } ) => {
 				const lastLoadedId = newToots[ newToots.length - 1 ].id;
 				setLastLoadedId( lastLoadedId )
 				setWatchForBottom( true )
-
 			} )
 			.catch( error => {
 				console.log("ERROR CAUGHT")
 				console.log(error)
 
-				if ( 429 === error.response.status ) {
+				if ( ! error.response ) {
+					console.log('non-server error - no response available')
+				} else if ( 429 === error.response.status ) {
 					setRateLimited( true )
 					try {
 						localStorage['rateLimitReset'] = error.response.headers['x-ratelimit-reset']
@@ -115,7 +116,7 @@ const ReverseList = ( { feed } ) => {
 				} else if ( 401 === error.response.status ) {
 					setErrorCode( 401 )
 				}
-			})
+			} )
 	}
 
 
@@ -234,13 +235,22 @@ const ReverseList = ( { feed } ) => {
 		// update displayed toots
 
 		if ( hideBoosts ) {
-			console.log('hiding boosts')
 			setDisplayedToots( toots.filter( t => ! t.reblog ) )
 		} else {
-			console.log('showing all boosts')
 			setDisplayedToots( toots )
 		}
 	}, [ hideBoosts, toots ] )
+
+	useEffect( () => {
+		// wait for state to update before loading more toots
+		if ( 0 === displayedToots.length ) {
+			return
+		}
+
+		setTimeout( () => {
+			loadToots( lastLoadedId, true )
+		}, 1000 )
+	}, [ displayedToots ] )
 
 	let tootContent = null
 
