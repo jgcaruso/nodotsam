@@ -1,7 +1,6 @@
 import { render, Fragment } from 'preact';
 import { useState, useEffect, useRef } from 'preact/hooks';
 import { query } from '../mastodon-query';
-import AccountWithToots from './AccountWithToots';
 import Toot from './Toot'
 import About from './About'
 import Toggle from './Toggle'
@@ -11,10 +10,8 @@ const ReverseList = ( { feed } ) => {
 	const appCreds = getAppCreds()
 	const accessToken = getAccessToken()
 
-	const [ accts, setAccts ] = useState( [] )
 	const [ toots, setToots ] = useState( [] )
 	const [ displayedToots, setDisplayedToots ] = useState( [] )
-	const [ mode, setMode ] = useState( 'list' )
 	const [ lastLoadedId, setLastLoadedId ] = useState( null )
 	const [ watchForBottom, setWatchForBottom ] = useState( false )
 	const bottomObserverRef = useRef( null );
@@ -100,33 +97,6 @@ const ReverseList = ( { feed } ) => {
 				const lastLoadedId = newToots[ newToots.length - 1 ].id;
 				setLastLoadedId( lastLoadedId )
 				setWatchForBottom( true )
-
-				// TODO: maybe remove this since the idea kind of isn't great, and it won't work with new toot query
-				let acctToots = {}
-
-				newToots.forEach( toot => {
-					if ( ! acctToots[ toot.account.acct ] ) {
-						// console.log(toot.account)
-						acctToots[ toot.account.acct ] = {
-							acct: toot.account.acct,
-							avatar: toot.account.avatar,
-							header: toot.account.header,
-							toots: [],
-						}
-					}
-
-					acctToots[ toot.account.acct ].toots.push( toot )
-				} )
-
-				// console.log(acctToots)
-
-				let acctList = []
-				Object.keys( acctToots ).forEach( a => {
-					const account = acctToots[a];
-					acctList.push( account )
-				} )
-
-				setAccts( acctList )
 
 			} )
 			.catch( error => {
@@ -274,26 +244,14 @@ const ReverseList = ( { feed } ) => {
 
 	let tootContent = null
 
-	if ( mode === 'acct-group' ) {
-		tootContent = <div className="acct-group">
-			{ accts.map( ( a, i ) => <AccountWithToots key={i} accountWithToots={ a } /> ) }
-		</div>
-	} else if ( mode === 'list' ) {
-		tootContent = <div className="toots-list">
+	tootContent = <div className="toots-list">
 			{ displayedToots.map( ( t, i ) => <Toot key={i} toot={ t } showAuthor={ true } observe={ ( el ) => topObserverRef.current.observe( el ) } /> ) }
 		</div>
-	} else {
-		tootContent = "invalid mode"
-	}
 
 	if ( ! accessToken ) {
 		return <About />
 	}
 
-	/*
-		<button onClick={ () => setMode('acct-group')}>Acct</button>
-		<button onClick={ () => setMode('list')}>List</button>
-	*/
 	return (
 		<>
 			<div className="header">
