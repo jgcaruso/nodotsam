@@ -57,9 +57,15 @@ body {
 }
 
 .title button {
+	all: unset;
+	cursor: pointer;
 	height: 44px;
 	padding: 10px;
 	box-sizing: border-box;
+}
+
+.title button:hover {
+	color: var(--toot-link-color);
 }
 
 .feed-selector {
@@ -205,7 +211,13 @@ body {
 }
 
 .toggle.enabled {
-	background: green;
+	display: flex;
+	background: var(--toot-link-color);
+	color: black;
+	height: 44px;
+	padding: 10px;
+	box-sizing: border-box;
+	align-items: center;
 }
 
 .toggleInput {
