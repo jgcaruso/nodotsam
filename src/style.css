@@ -85,6 +85,10 @@ body {
 	box-sizing: border-box;
 }
 
+.page a {
+	color: var(--toot-link-color);
+}
+
 .account {
 	cursor: pointer;
 	border: 1px solid grey;
