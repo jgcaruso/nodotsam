@@ -160,16 +160,22 @@ const ReverseList = ( { feed } ) => {
 						console.error( 'cannot access seen state' )
 					}
 
+					const currentTootId = entry.target.attributes.tootid.value
+
+					if ( -1 === seenState.indexOf( currentTootId ) ) {
+						seenState.push( currentTootId )
+					}
+
 					// lazy dequeue: reverse, pop, reverse
 					seenState.reverse()
 
-					while ( seenState.length >= 3 ) {
+					// TODO: 3 might not be a great default, maybe 2?
+					// need more testing when constantly refreshing to ensure the same toot keeps appearing
+					while ( seenState.length > 3 ) {
 						seenState.pop()
 					}
 
 					seenState.reverse()
-
-					seenState.push( entry.target.attributes.tootid.value )
 
 					try {
 						localStorage[`${ feed }SeenState`] = JSON.stringify( seenState )
