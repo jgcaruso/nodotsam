@@ -25,8 +25,6 @@ export default function Toot( { toot, showAuthor = false, booster = null, booste
 		observe( idRef.current )
 	}, [ idRef ] )
 
-	// console.log(toot)
-
 	const renderCard = ( card ) => {
 		if ( ! card ) {
 			return
@@ -54,7 +52,8 @@ export default function Toot( { toot, showAuthor = false, booster = null, booste
 	const handleRepliesClick = () => {
 		// query( getAppCreds().instance, getAccessToken(), `/api/v1/statuses/${ toot.id }/context` )
 			// .then( r => console.log( r ) )
-		window.open( toot.url )
+
+		window.open( `https://${ getAppCreds().instance }/@${ toot.account.acct }/${ toot.id }` )
 	}
 
 	return (
@@ -77,9 +76,7 @@ export default function Toot( { toot, showAuthor = false, booster = null, booste
 				)
 			}
 			<div className="timestamp" title={toot.created_at}>{moment(toot.created_at).fromNow()}</div>
-			{ toot.replies_count > 0 && (
-				<button className="replies" onClick={ handleRepliesClick }>see replies ({ toot.replies_count })</button>
-			) }
+			<button className="replies" onClick={ handleRepliesClick }>see toot ({ toot.replies_count } replies)</button>
 			<div className="content" dangerouslySetInnerHTML={{ __html: html }} />
 			{ toot.card && (
 				<div className="card">
