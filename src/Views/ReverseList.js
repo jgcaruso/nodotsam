@@ -25,6 +25,17 @@ const ReverseList = ( { feed } ) => {
 		window.location = '/'
 	}
 
+	const handleFeedChanged = ( e ) => {
+		const feed = e.target.value
+
+		if ( 'home' === feed ) {
+			window.location = `/`
+			return
+		}
+
+		window.location = `/${ feed }`
+	}
+
 	const loadToots = ( loadFromId, append = false ) => {
 		if ( ! accessToken ) {
 			console.log("no access token, aborting load operation")
@@ -260,26 +271,37 @@ const ReverseList = ( { feed } ) => {
 	*/
 	return (
 		<>
-			<div className="title">Messages</div>
-			<button onClick={ handleLogout }>Logout</button>
-			{
-				tootContent
-			}
-			<div className="error">{ rateLimited && ( `Rate limited until ${localStorage['rateLimitReset']}` ) }</div>
-			<div className="error">{ 401 === errorCode && (
-				<>
-					<span>Request for Toots failed because the app is not authorized, try logging in again.</span>
-					<a href='/login'>Login again</a>
-				</>
-			) }
-			{ 403 === errorCode && (
-				<>
-					<span>Request for Toots failed because the stored credentials are unauthorized, try logging in again.</span>
-					<a href='/login'>Login again</a>
-				</>
-			) }
+			<div className="header">
+				<div className="title">
+					<span>nodotsam.party</span>
+					<button onClick={ handleLogout }>Logout</button>
+				</div>
+				<select className="feed-selector" onChange={ handleFeedChanged }>
+					<option value="home" selected={ 'home' === feed }>Home</option>
+					<option value="local" selected={ 'local' === feed }>Local</option>
+					<option value="federated" selected={ 'federated' === feed }>Federated</option>
+				</select>
 			</div>
-			<div id='bottom-indicator'>Loading more...</div>
+			<div className="toots-wrapper">
+				{
+					tootContent
+				}
+				<div className="error">{ rateLimited && ( `Rate limited until ${localStorage['rateLimitReset']}` ) }</div>
+				<div className="error">{ 401 === errorCode && (
+					<>
+						<span>Request for Toots failed because the app is not authorized, try logging in again.</span>
+						<a href='/login'>Login again</a>
+					</>
+				) }
+				{ 403 === errorCode && (
+					<>
+						<span>Request for Toots failed because the stored credentials are unauthorized, try logging in again.</span>
+						<a href='/login'>Login again</a>
+					</>
+				) }
+				</div>
+				<div id='bottom-indicator'>Loading more...</div>
+			</div>
 		</>
 	)
 }
