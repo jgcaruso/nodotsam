@@ -13,7 +13,9 @@ const Page = () => {
 	return (
 		<div className="page">
 			<Router>
-				<ReverseList path='/' />
+				<ReverseList path='/' feed='home' />
+				<ReverseList path='/local' feed='local' />
+				<ReverseList path='/federated' feed='federated' />
 				<About path='/about' showHomeLink={ true } />
 				<OauthCallback path='/callback' />
 				<Login path='/login' />

@@ -6,7 +6,7 @@ import Toot from './Toot'
 import About from './About'
 import { compareTootId, ready, getAppCreds, getAccessToken } from '../functions'
 
-const ReverseList = () => {
+const ReverseList = ( { feed } ) => {
 	const appCreds = getAppCreds()
 	const accessToken = getAccessToken()
 
@@ -36,15 +36,26 @@ const ReverseList = () => {
 			return;
 		}
 
-		let homeQuery = '/api/v1/timelines/home?limit=20';
+		let feedPath = 'home'
+		if ( 'local' === feed || 'federated' === feed ) {
+			feedPath = 'public'
+		}
+
+		let feedQuery = `/api/v1/timelines/${ feedPath }?limit=20`;
 
 		if ( !! loadFromId ) {
-			homeQuery = homeQuery + `&min_id=${ loadFromId }`
+			feedQuery = feedQuery + `&min_id=${ loadFromId }`
+		}
+
+		if ( 'local' === feed ) {
+			feedQuery = feedQuery + `&local=true`
+		} else if ( 'federated' === feed ) {
+			feedQuery = feedQuery + `&remote=true`
 		}
 
 		setWatchForBottom( false ) // disable while query is happening
 
-		query( appCreds.instance, accessToken, homeQuery )
+		query( appCreds.instance, accessToken, feedQuery )
 			.then ( newToots => {
 				setErrorCode( 0 )
 
@@ -109,7 +120,7 @@ const ReverseList = () => {
 					try {
 						localStorage['rateLimitReset'] = error.response.headers['x-ratelimit-reset']
 					} catch ( ex ) {
-						console.err('cannot access localstorage to set rateLimitReset')
+						console.error('cannot access localstorage to set rateLimitReset')
 					}
 				} else if ( 403 === error.response.status ) {
 					setErrorCode( 403 )
@@ -130,15 +141,35 @@ const ReverseList = () => {
 		let callback = ( entries, observer ) => {
 			entries.forEach( ( entry ) => {
 				if ( entry.isIntersecting ) {
-					localStorage['prev2LastSeenId'] = localStorage['prevLastSeenId']
-					localStorage['prevLastSeenId'] = localStorage['lastSeenId']
-					localStorage['lastSeenId'] = entry.target.attributes.tootid.value
-					 
+					let seenState = []
+					try {
+						seenState = JSON.parse( localStorage[`${ feed }SeenState`] )
+					} catch ( ex ) {
+						// ignore
+						console.error( 'cannot access seen state' )
+					}
+
+					// lazy dequeue: reverse, pop, reverse
+					seenState.reverse()
+
+					while ( seenState.length >= 3 ) {
+						seenState.pop()
+					}
+
+					seenState.reverse()
+
+					seenState.push( entry.target.attributes.tootid.value )
+
+					try {
+						localStorage[`${ feed }SeenState`] = JSON.stringify( seenState )
+					} catch( ex ) {
+						console.error( 'cannot access seen state' )
+					}
 				}
 			} );
 		};
 
-		topObserverRef.current = new IntersectionObserver(callback, options);
+		topObserverRef.current = new IntersectionObserver( callback, options );
 	}, [] )
 
 	useEffect( () => {
@@ -186,7 +217,9 @@ const ReverseList = () => {
 		*/
 		let lastSeenId = null
 		try {
-			lastSeenId = localStorage['prev2LastSeenId']
+			let seenState = JSON.parse( localStorage[`${ feed }SeenState`] )
+
+			lastSeenId = seenState[0]
 		} catch (ex) {
 			console.log( 'could not retrieve last saved state (localStorage access failed). Checking markers.' )
 		}
@@ -194,7 +227,7 @@ const ReverseList = () => {
 		if ( lastSeenId ) {
 			loadToots( lastSeenId )
 		} else {
-			query( appCreds.instance, accessToken, '/api/v1/markers?timeline[]=home' )
+			query( appCreds.instance, accessToken, `/api/v1/markers?timeline[]=${ feed }` ) // NOTE: this might not be valid for anything but HOME
 				.then( r => {
 					loadToots( r.last_read_id )
 				} )

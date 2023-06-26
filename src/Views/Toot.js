@@ -25,7 +25,7 @@ export default function Toot( { toot, showAuthor = false, booster = null, booste
 		observe( idRef.current )
 	}, [ idRef ] )
 
-	console.log(toot)
+	// console.log(toot)
 
 	const renderCard = ( card ) => {
 		if ( ! card ) {
