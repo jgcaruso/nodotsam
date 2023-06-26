@@ -11,7 +11,7 @@ export default function Login () {
 	const handleConnect = () => {
 		setShowConnecting( true )
 
-		let cleanedInstance = instance
+		let cleanedInstance = instance.trim()
 
 		if ( cleanedInstance.endsWith( '/' ) ) {
 			cleanedInstance = cleanedInstance.substring( 0, cleanedInstance.length - 1 )
