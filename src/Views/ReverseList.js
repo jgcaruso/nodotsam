@@ -18,8 +18,7 @@ const ReverseList = () => {
 	const bottomObserverRef = useRef( null );
 	const topObserverRef = useRef( null );
 	const [ rateLimited, setRateLimited ] = useState( false )
-	const [ unauthorized, setUnauthorized ] = useState( false )
-
+	const [ errorCode, setErrorCode ] = useState( 0 )
 
 	const handleLogout = () => {
 		localStorage['mastodon-user-access-token'] = ''
@@ -47,6 +46,7 @@ const ReverseList = () => {
 
 		query( appCreds.instance, accessToken, homeQuery )
 			.then ( newToots => {
+				setErrorCode( 0 )
 
 				if ( 0 === newToots.length ) {
 					document.getElementById( 'bottom-indicator' ).innerText = append ? 'No more toots' : 'No unread toots'
@@ -111,8 +111,10 @@ const ReverseList = () => {
 					} catch ( ex ) {
 						console.err('cannot access localstorage to set rateLimitReset')
 					}
+				} else if ( 403 === error.response.status ) {
+					setErrorCode( 403 )
 				} else if ( 401 === error.response.status ) {
-					setUnauthorized( true )
+					setErrorCode( 401 )
 				}
 			})
 	}
@@ -231,9 +233,15 @@ const ReverseList = () => {
 				tootContent
 			}
 			<div className="error">{ rateLimited && ( `Rate limited until ${localStorage['rateLimitReset']}` ) }</div>
-			<div className="error">{ unauthorized && ( 
+			<div className="error">{ 401 === errorCode && (
 				<>
 					<span>Request for Toots failed because the app is not authorized, try logging in again.</span>
+					<a href='/login'>Login again</a>
+				</>
+			) }
+			{ 403 === errorCode && (
+				<>
+					<span>Request for Toots failed because the stored credentials are unauthorized, try logging in again.</span>
 					<a href='/login'>Login again</a>
 				</>
 			) }
