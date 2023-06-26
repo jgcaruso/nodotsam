@@ -4,6 +4,7 @@ import { query } from '../mastodon-query';
 import AccountWithToots from './AccountWithToots';
 import Toot from './Toot'
 import About from './About'
+import Toggle from './Toggle'
 import { compareTootId, ready, getAppCreds, getAccessToken } from '../functions'
 
 const ReverseList = ( { feed } ) => {
@@ -12,6 +13,7 @@ const ReverseList = ( { feed } ) => {
 
 	const [ accts, setAccts ] = useState( [] )
 	const [ toots, setToots ] = useState( [] )
+	const [ displayedToots, setDisplayedToots ] = useState( [] )
 	const [ mode, setMode ] = useState( 'list' )
 	const [ lastLoadedId, setLastLoadedId ] = useState( null )
 	const [ watchForBottom, setWatchForBottom ] = useState( false )
@@ -19,6 +21,7 @@ const ReverseList = ( { feed } ) => {
 	const topObserverRef = useRef( null );
 	const [ rateLimited, setRateLimited ] = useState( false )
 	const [ errorCode, setErrorCode ] = useState( 0 )
+	const [ hideBoosts, setHideBoosts ] = useState( false )
 
 	const handleLogout = () => {
 		localStorage['mastodon-user-access-token'] = ''
@@ -34,6 +37,10 @@ const ReverseList = ( { feed } ) => {
 		}
 
 		window.location = `/${ feed }`
+	}
+
+	const hideBoostsChanged = ( enabled ) => {
+		setHideBoosts( enabled )
 	}
 
 	const loadToots = ( loadFromId, append = false ) => {
@@ -253,6 +260,18 @@ const ReverseList = ( { feed } ) => {
 	}
 	, []);
 
+	useEffect( () => {
+		// update displayed toots
+
+		if ( hideBoosts ) {
+			console.log('hiding boosts')
+			setDisplayedToots( toots.filter( t => ! t.reblog ) )
+		} else {
+			console.log('showing all boosts')
+			setDisplayedToots( toots )
+		}
+	}, [ hideBoosts, toots ] )
+
 	let tootContent = null
 
 	if ( mode === 'acct-group' ) {
@@ -261,7 +280,7 @@ const ReverseList = ( { feed } ) => {
 		</div>
 	} else if ( mode === 'list' ) {
 		tootContent = <div className="toots-list">
-			{ toots.map( ( t, i ) => <Toot key={i} toot={ t } showAuthor={ true } observe={ ( el ) => topObserverRef.current.observe( el ) } /> ) }
+			{ displayedToots.map( ( t, i ) => <Toot key={i} toot={ t } showAuthor={ true } observe={ ( el ) => topObserverRef.current.observe( el ) } /> ) }
 		</div>
 	} else {
 		tootContent = "invalid mode"
@@ -280,6 +299,7 @@ const ReverseList = ( { feed } ) => {
 			<div className="header">
 				<div className="title">
 					<span>nodotsam.party</span>
+					<Toggle toggleId="hideBoosts" onChange={ hideBoostsChanged }>Hide Boosts</Toggle>
 					<button onClick={ handleLogout }>Logout</button>
 				</div>
 				<select className="feed-selector" onChange={ handleFeedChanged }>

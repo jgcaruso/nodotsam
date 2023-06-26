@@ -199,3 +199,15 @@ body {
 	margin-top: 20px;
 	text-align: center;
 }
+
+.toggle {
+	cursor: pointer;
+}
+
+.toggle.enabled {
+	background: green;
+}
+
+.toggleInput {
+	display: none;
+}
