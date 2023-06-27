@@ -20,6 +20,9 @@ const ReverseList = ( { feed } ) => {
 	const [ errorCode, setErrorCode ] = useState( 0 )
 	const [ hideBoosts, setHideBoosts ] = useState( false )
 
+	const viewedSet = useRef( new Set() )
+	const [ seenTootCount, setSeenTootCount ] = useState( 0 )
+
 	const handleLogout = () => {
 		localStorage['mastodon-user-access-token'] = ''
 		window.location = '/'
@@ -56,7 +59,7 @@ const ReverseList = ( { feed } ) => {
 			feedPath = 'public'
 		}
 
-		let feedQuery = `/api/v1/timelines/${ feedPath }?limit=20`;
+		let feedQuery = `/api/v1/timelines/${ feedPath }?limit=40`;
 
 		if ( !! loadFromId ) {
 			feedQuery = feedQuery + `&min_id=${ loadFromId }`
@@ -130,6 +133,12 @@ const ReverseList = ( { feed } ) => {
 		let callback = ( entries, observer ) => {
 			entries.forEach( ( entry ) => {
 				if ( entry.isIntersecting ) {
+
+					const currentTootId = entry.target.attributes.tootid.value
+
+					viewedSet.current.add( currentTootId )
+					setSeenTootCount( viewedSet.current.size )
+
 					let seenState = []
 					try {
 						seenState = JSON.parse( localStorage[`${ feed }SeenState`] )
@@ -137,8 +146,6 @@ const ReverseList = ( { feed } ) => {
 						// ignore
 						console.error( 'cannot access seen state' )
 					}
-
-					const currentTootId = entry.target.attributes.tootid.value
 
 					if ( -1 === seenState.indexOf( currentTootId ) ) {
 						seenState.push( currentTootId )
@@ -297,7 +304,7 @@ const ReverseList = ( { feed } ) => {
 				<div id='bottom-indicator'>Loading more...</div>
 			</div>
 			<div className="footer">
-				{ displayedToots.length > 0 && ( <div className="toot-count">{ displayedToots.length }</div> ) }
+				{ ( displayedToots.length - seenTootCount ) > 0 && ( <div className="toot-count">{ displayedToots.length - seenTootCount }</div> ) }
 			</div>
 		</>
 	)
