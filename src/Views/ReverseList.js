@@ -296,6 +296,9 @@ const ReverseList = ( { feed } ) => {
 				</div>
 				<div id='bottom-indicator'>Loading more...</div>
 			</div>
+			<div className="footer">
+				{ displayedToots.length > 0 && ( <div className="toot-count">{ displayedToots.length }</div> ) }
+			</div>
 		</>
 	)
 }
