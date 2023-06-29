@@ -4,13 +4,13 @@ import { useEffect, useRef } from 'preact/hooks'
 import { noop, getAppCreds, getAccessToken } from '../functions'
 import { query } from '../mastodon-query'
 
-export default function Toot( { toot, showAuthor = false, booster = null, boosterId = null, observe = noop } ) {
+export default function Toot( { toot, tootIndex, showAuthor = false, booster = null, boosterId = null, observe = noop } ) {
 
 	const html = toot.content !== '' ? toot.content : ( toot.reblog?.content ?? '' )
 
 	if ( !! toot.reblog ) {
 		return (
-			<Toot toot={ toot.reblog } showAuthor={ true } booster={ toot.account } boosterId={ toot.id } observe={ observe } />
+			<Toot toot={ toot.reblog } tootIndex={ tootIndex } showAuthor={ true } booster={ toot.account } boosterId={ toot.id } observe={ observe } />
 		)
 	}
 	const idRef = useRef( null )
@@ -96,7 +96,7 @@ export default function Toot( { toot, showAuthor = false, booster = null, booste
 					}
 				} ) }
 			</div>
-			<span ref={ idRef } tootId={ tootId }></span>
+			<span ref={ idRef } tootId={ tootId } tootIndex={ tootIndex }></span>
 		</div>
 	);
 }

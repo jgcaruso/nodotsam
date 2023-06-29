@@ -5,6 +5,7 @@
 	--error-text: red;
 	--toot-link-color: #096582;
 	--content-width: 400px;
+	--toot-indicator-color: white;
 }
 
 @media( prefers-color-scheme: dark ) {
@@ -13,6 +14,7 @@
 		--title-text: white;
 		--text: #ffffff;
 		--toot-link-color: #FFDB58;
+		--toot-indicator-color: black;
 	}
 }
 
@@ -41,6 +43,33 @@ body {
 	margin: 0 auto;
 	margin-bottom: 10px;
 	margin-top: 10px;
+}
+
+.footer {
+	padding: 10px;
+	background: transparent;
+	position: absolute;
+	bottom: 0;
+	left: calc(50% - var(--content-width) / 2);
+	width: var(--content-width);
+	box-sizing: border-box;
+	text-align: right;
+}
+
+.footer .toot-count {
+	display: inline-block;
+	margin: 0 auto;
+	text-align: center;
+	background: var(--toot-link-color);
+	color: var(--toot-indicator-color);
+	border-radius: 20px;
+	padding: 8px;
+	min-width: 50px;
+	box-sizing: border-box;
+}
+
+.footer .toot-count.dim {
+	opacity: 0.5;
 }
 
 .title {

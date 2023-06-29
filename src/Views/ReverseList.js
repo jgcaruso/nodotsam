@@ -20,6 +20,9 @@ const ReverseList = ( { feed } ) => {
 	const [ errorCode, setErrorCode ] = useState( 0 )
 	const [ hideBoosts, setHideBoosts ] = useState( false )
 
+	const [ seenTootCount, setSeenTootCount ] = useState( 0 )
+	const [ dimTootIndicator, setDimTootIndicator ] = useState( false )
+
 	const handleLogout = () => {
 		localStorage['mastodon-user-access-token'] = ''
 		window.location = '/'
@@ -40,6 +43,19 @@ const ReverseList = ( { feed } ) => {
 		setHideBoosts( enabled )
 	}
 
+	// need to be global, otherwise the callback closure doesn't allow `seenTootCount` to read the new value
+	window.maybeSetSeenTootCount = ( newCount ) => {
+		if ( newCount > seenTootCount ) {
+			setSeenTootCount( newCount )
+		}
+
+		if ( newCount <= seenTootCount ) {
+			setDimTootIndicator( true )
+		} else {
+			setDimTootIndicator( false )
+		}
+	}
+
 	const loadToots = ( loadFromId, append = false ) => {
 		if ( ! accessToken ) {
 			console.log("no access token, aborting load operation")
@@ -56,7 +72,7 @@ const ReverseList = ( { feed } ) => {
 			feedPath = 'public'
 		}
 
-		let feedQuery = `/api/v1/timelines/${ feedPath }?limit=20`;
+		let feedQuery = `/api/v1/timelines/${ feedPath }?limit=40`;
 
 		if ( !! loadFromId ) {
 			feedQuery = feedQuery + `&min_id=${ loadFromId }`
@@ -97,13 +113,14 @@ const ReverseList = ( { feed } ) => {
 				const lastLoadedId = newToots[ newToots.length - 1 ].id;
 				setLastLoadedId( lastLoadedId )
 				setWatchForBottom( true )
-
 			} )
 			.catch( error => {
 				console.log("ERROR CAUGHT")
 				console.log(error)
 
-				if ( 429 === error.response.status ) {
+				if ( ! error.response ) {
+					console.log('non-server error - no response available')
+				} else if ( 429 === error.response.status ) {
 					setRateLimited( true )
 					try {
 						localStorage['rateLimitReset'] = error.response.headers['x-ratelimit-reset']
@@ -115,7 +132,7 @@ const ReverseList = ( { feed } ) => {
 				} else if ( 401 === error.response.status ) {
 					setErrorCode( 401 )
 				}
-			})
+			} )
 	}
 
 
@@ -129,6 +146,12 @@ const ReverseList = ( { feed } ) => {
 		let callback = ( entries, observer ) => {
 			entries.forEach( ( entry ) => {
 				if ( entry.isIntersecting ) {
+
+					const currentTootId = entry.target.attributes.tootid.value
+					const currentTootIndex = parseInt( entry.target.attributes.tootindex.value, 10 )
+
+					window.maybeSetSeenTootCount( currentTootIndex + 1 ) // toot index is 0 based
+
 					let seenState = []
 					try {
 						seenState = JSON.parse( localStorage[`${ feed }SeenState`] )
@@ -136,8 +159,6 @@ const ReverseList = ( { feed } ) => {
 						// ignore
 						console.error( 'cannot access seen state' )
 					}
-
-					const currentTootId = entry.target.attributes.tootid.value
 
 					if ( -1 === seenState.indexOf( currentTootId ) ) {
 						seenState.push( currentTootId )
@@ -234,18 +255,27 @@ const ReverseList = ( { feed } ) => {
 		// update displayed toots
 
 		if ( hideBoosts ) {
-			console.log('hiding boosts')
 			setDisplayedToots( toots.filter( t => ! t.reblog ) )
 		} else {
-			console.log('showing all boosts')
 			setDisplayedToots( toots )
 		}
 	}, [ hideBoosts, toots ] )
 
+	useEffect( () => {
+		// wait for state to update before loading more toots
+		if ( 0 === displayedToots.length ) {
+			return
+		}
+
+		setTimeout( () => {
+			loadToots( lastLoadedId, true )
+		}, 1000 )
+	}, [ displayedToots ] )
+
 	let tootContent = null
 
 	tootContent = <div className="toots-list">
-			{ displayedToots.map( ( t, i ) => <Toot key={i} toot={ t } showAuthor={ true } observe={ ( el ) => topObserverRef.current.observe( el ) } /> ) }
+			{ displayedToots.map( ( t, i ) => <Toot key={ i } tootIndex={ i } toot={ t } showAuthor={ true } observe={ ( el ) => topObserverRef.current.observe( el ) } /> ) }
 		</div>
 
 	if ( ! accessToken ) {
@@ -285,6 +315,9 @@ const ReverseList = ( { feed } ) => {
 				) }
 				</div>
 				<div id='bottom-indicator'>Loading more...</div>
+			</div>
+			<div className="footer">
+				{ ( displayedToots.length - seenTootCount ) > 0 && ( <div className={`toot-count ${ dimTootIndicator ? 'dim' : '' }`}>{ displayedToots.length - seenTootCount }</div> ) }
 			</div>
 		</>
 	)
