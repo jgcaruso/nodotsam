@@ -49,7 +49,7 @@ const ReverseList = ( { feed } ) => {
 			setSeenTootCount( newCount )
 		}
 
-		if ( newCount < seenTootCount ) {
+		if ( newCount <= seenTootCount ) {
 			setDimTootIndicator( true )
 		} else {
 			setDimTootIndicator( false )
