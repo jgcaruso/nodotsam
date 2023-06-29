@@ -21,6 +21,7 @@ const ReverseList = ( { feed } ) => {
 	const [ hideBoosts, setHideBoosts ] = useState( false )
 
 	const [ seenTootCount, setSeenTootCount ] = useState( 0 )
+	const [ dimTootIndicator, setDimTootIndicator ] = useState( false )
 
 	const handleLogout = () => {
 		localStorage['mastodon-user-access-token'] = ''
@@ -46,6 +47,12 @@ const ReverseList = ( { feed } ) => {
 	window.maybeSetSeenTootCount = ( newCount ) => {
 		if ( newCount > seenTootCount ) {
 			setSeenTootCount( newCount )
+		}
+
+		if ( newCount < seenTootCount ) {
+			setDimTootIndicator( true )
+		} else {
+			setDimTootIndicator( false )
 		}
 	}
 
@@ -310,7 +317,7 @@ const ReverseList = ( { feed } ) => {
 				<div id='bottom-indicator'>Loading more...</div>
 			</div>
 			<div className="footer">
-				{ ( displayedToots.length - seenTootCount ) > 0 && ( <div className="toot-count">{ displayedToots.length - seenTootCount }</div> ) }
+				{ ( displayedToots.length - seenTootCount ) > 0 && ( <div className={`toot-count ${ dimTootIndicator ? 'dim' : '' }`}>{ displayedToots.length - seenTootCount }</div> ) }
 			</div>
 		</>
 	)

@@ -68,6 +68,10 @@ body {
 	box-sizing: border-box;
 }
 
+.footer .toot-count.dim {
+	opacity: 0.5;
+}
+
 .title {
 	color: var(--title-text);
 	text-align: center;
