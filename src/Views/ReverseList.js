@@ -20,7 +20,6 @@ const ReverseList = ( { feed } ) => {
 	const [ errorCode, setErrorCode ] = useState( 0 )
 	const [ hideBoosts, setHideBoosts ] = useState( false )
 
-	const viewedSet = useRef( new Set() )
 	const [ seenTootCount, setSeenTootCount ] = useState( 0 )
 
 	const handleLogout = () => {
@@ -41,6 +40,13 @@ const ReverseList = ( { feed } ) => {
 
 	const hideBoostsChanged = ( enabled ) => {
 		setHideBoosts( enabled )
+	}
+
+	// need to be global, otherwise the callback closure doesn't allow `seenTootCount` to read the new value
+	window.maybeSetSeenTootCount = ( newCount ) => {
+		if ( newCount > seenTootCount ) {
+			setSeenTootCount( newCount )
+		}
 	}
 
 	const loadToots = ( loadFromId, append = false ) => {
@@ -135,9 +141,9 @@ const ReverseList = ( { feed } ) => {
 				if ( entry.isIntersecting ) {
 
 					const currentTootId = entry.target.attributes.tootid.value
+					const currentTootIndex = parseInt( entry.target.attributes.tootindex.value, 10 )
 
-					viewedSet.current.add( currentTootId )
-					setSeenTootCount( viewedSet.current.size )
+					window.maybeSetSeenTootCount( currentTootIndex + 1 ) // toot index is 0 based
 
 					let seenState = []
 					try {
@@ -262,7 +268,7 @@ const ReverseList = ( { feed } ) => {
 	let tootContent = null
 
 	tootContent = <div className="toots-list">
-			{ displayedToots.map( ( t, i ) => <Toot key={i} toot={ t } showAuthor={ true } observe={ ( el ) => topObserverRef.current.observe( el ) } /> ) }
+			{ displayedToots.map( ( t, i ) => <Toot key={ i } tootIndex={ i } toot={ t } showAuthor={ true } observe={ ( el ) => topObserverRef.current.observe( el ) } /> ) }
 		</div>
 
 	if ( ! accessToken ) {
