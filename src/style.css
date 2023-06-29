@@ -256,3 +256,16 @@ body {
 .toggleInput {
 	display: none;
 }
+
+.connect-controls {
+	display: flex;
+	flex-direction: column;
+	margin-top: 20px;
+	gap: 10px;
+	align-items: center;
+}
+
+.connect-controls button {
+	height: 44px;
+	padding: 10px;
+}

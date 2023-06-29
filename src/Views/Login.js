@@ -54,8 +54,8 @@ export default function Login () {
 		<>
 			<div>Login</div>
 
-			<div>
-				<label for='instance'>Instance</label>
+			<div className="connect-controls">
+				<label for='instance'>Enter Your Instance's Domain</label>
 				<input id='instance' value={instance} onChange={ ( e ) => setInstance( e.target.value ) } />
 				<button onClick={ handleConnect }>Connect</button>
 			</div>
